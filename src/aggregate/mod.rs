@@ -209,6 +209,16 @@ impl Dialog {
         self.current_topic.and_then(|id| self.topics.get(&id))
     }
     
+    /// Get primary participant ID
+    pub fn primary_participant(&self) -> Uuid {
+        self.primary_participant
+    }
+    
+    /// Get metadata
+    pub fn metadata(&self) -> &HashMap<String, serde_json::Value> {
+        &self.metadata
+    }
+    
     /// Add a participant to the dialog
     pub fn add_participant(&mut self, participant: Participant) -> DomainResult<Vec<Box<dyn DomainEvent>>> {
         if self.status != DialogStatus::Active {
