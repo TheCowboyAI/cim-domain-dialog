@@ -1,12 +1,10 @@
 //! Dialog command definitions
 
 use cim_domain::Command;
-use uuid::Uuid;
 use serde_json::Value;
+use uuid::Uuid;
 
-use crate::value_objects::{
-    Turn, Topic, Participant, ContextVariable,
-};
+use crate::value_objects::{ContextVariable, Participant, Topic, Turn};
 
 /// Start a new dialog
 #[derive(Debug, Clone)]
@@ -216,4 +214,4 @@ impl Command for AddContextVariable {
     fn aggregate_id(&self) -> Option<cim_domain::EntityId<Self::Aggregate>> {
         None // We'll use the dialog_id field to find the aggregate
     }
-} 
+}

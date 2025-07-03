@@ -1,9 +1,9 @@
 //! Value objects for the Dialog domain
 
-use serde::{Deserialize, Serialize};
-use uuid::Uuid;
 use chrono::{DateTime, Utc};
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+use uuid::Uuid;
 
 /// A single turn in a conversation
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
@@ -328,8 +328,8 @@ impl Topic {
         let elapsed = Utc::now()
             .signed_duration_since(self.relevance.last_updated)
             .num_seconds() as f32;
-        
+
         let decayed = self.relevance.score * (-self.relevance.decay_rate * elapsed / 3600.0).exp();
         decayed.max(0.0).min(1.0)
     }
-} 
+}

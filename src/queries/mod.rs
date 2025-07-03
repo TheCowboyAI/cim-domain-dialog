@@ -1,4 +1,4 @@
 //! Dialog queries
 
 pub struct DialogQuery;
-pub struct DialogQueryHandler; 
+pub struct DialogQueryHandler;

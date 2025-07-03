@@ -22,33 +22,26 @@ pub mod value_objects;
 
 // Re-export main types
 pub use aggregate::{
-    Dialog, DialogMarker, DialogStatus, DialogType,
-    ConversationContext, ContextState,
+    ContextState, ConversationContext, Dialog, DialogMarker, DialogStatus, DialogType,
 };
 
 pub use commands::{
-    StartDialog, EndDialog, AddTurn, SwitchContext,
-    UpdateContext, PauseDialog, ResumeDialog,
-    SetDialogMetadata, AddParticipant, RemoveParticipant,
-    MarkTopicComplete, AddContextVariable,
+    AddContextVariable, AddParticipant, AddTurn, EndDialog, MarkTopicComplete, PauseDialog,
+    RemoveParticipant, ResumeDialog, SetDialogMetadata, StartDialog, SwitchContext, UpdateContext,
 };
 
 pub use events::{
-    DialogStarted, DialogEnded, TurnAdded, ContextSwitched,
-    ContextUpdated, DialogPaused, DialogResumed,
-    DialogMetadataSet, ParticipantAdded, ParticipantRemoved,
-    TopicCompleted, ContextVariableAdded,
+    ContextSwitched, ContextUpdated, ContextVariableAdded, DialogEnded, DialogMetadataSet,
+    DialogPaused, DialogResumed, DialogStarted, ParticipantAdded, ParticipantRemoved,
+    TopicCompleted, TurnAdded,
 };
 
 pub use handlers::{DialogCommandHandler, DialogEventHandler};
-pub use projections::{DialogView, ConversationHistory, ActiveDialogs};
+pub use projections::{ActiveDialogs, ConversationHistory, DialogView};
 pub use queries::{DialogQuery, DialogQueryHandler};
 
 pub use value_objects::{
-    Turn, TurnType, TurnMetadata,
-    Participant, ParticipantType, ParticipantRole,
-    Message, MessageContent, MessageIntent,
-    Topic, TopicStatus, TopicRelevance,
-    ContextVariable, ContextScope,
-    ConversationMetrics, EngagementMetrics,
-}; 
+    ContextScope, ContextVariable, ConversationMetrics, EngagementMetrics, Message, MessageContent,
+    MessageIntent, Participant, ParticipantRole, ParticipantType, Topic, TopicRelevance,
+    TopicStatus, Turn, TurnMetadata, TurnType,
+};

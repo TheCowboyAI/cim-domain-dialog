@@ -1,15 +1,12 @@
 //! Dialog domain events
 
+use chrono::{DateTime, Utc};
 use cim_domain::DomainEvent;
 use serde::{Deserialize, Serialize};
-use uuid::Uuid;
-use chrono::{DateTime, Utc};
 use std::collections::HashMap;
+use uuid::Uuid;
 
-use crate::value_objects::{
-    Turn, Topic, Participant, ContextVariable,
-    ConversationMetrics,
-};
+use crate::value_objects::{ContextVariable, ConversationMetrics, Participant, Topic, Turn};
 
 /// Dialog started event
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -278,4 +275,4 @@ impl DomainEvent for ContextVariableAdded {
     fn event_type(&self) -> &'static str {
         "ContextVariableAdded"
     }
-} 
+}

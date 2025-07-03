@@ -1,14 +1,12 @@
 //! Tests for the Dialog domain
 
-use cim_domain_dialog::{
-    Dialog, DialogType,
-    Participant, ParticipantType, ParticipantRole,
-    Turn, TurnType, Message, MessageIntent,
-    Topic, ContextVariable, ContextScope,
-};
-use uuid::Uuid;
 use chrono::Utc;
+use cim_domain_dialog::{
+    ContextScope, ContextVariable, Dialog, DialogType, Message, MessageIntent, Participant,
+    ParticipantRole, ParticipantType, Topic, Turn, TurnType,
+};
 use std::collections::HashMap;
+use uuid::Uuid;
 
 #[test]
 fn test_create_dialog() {
@@ -22,11 +20,7 @@ fn test_create_dialog() {
     };
 
     // Create a dialog
-    let dialog = Dialog::new(
-        Uuid::new_v4(),
-        DialogType::Direct,
-        user.clone(),
-    );
+    let dialog = Dialog::new(Uuid::new_v4(), DialogType::Direct, user.clone());
 
     assert_eq!(dialog.dialog_type(), DialogType::Direct);
     assert_eq!(dialog.participants().len(), 1);
@@ -44,11 +38,7 @@ fn test_add_participant() {
         metadata: HashMap::new(),
     };
 
-    let mut dialog = Dialog::new(
-        Uuid::new_v4(),
-        DialogType::Direct,
-        user,
-    );
+    let mut dialog = Dialog::new(Uuid::new_v4(), DialogType::Direct, user);
 
     // Add an AI agent participant
     let agent = Participant {
@@ -77,11 +67,7 @@ fn test_add_turn() {
         metadata: HashMap::new(),
     };
 
-    let mut dialog = Dialog::new(
-        Uuid::new_v4(),
-        DialogType::Direct,
-        user,
-    );
+    let mut dialog = Dialog::new(Uuid::new_v4(), DialogType::Direct, user);
 
     // Add a turn
     let turn = Turn::new(
@@ -107,11 +93,7 @@ fn test_context_switching() {
         metadata: HashMap::new(),
     };
 
-    let mut dialog = Dialog::new(
-        Uuid::new_v4(),
-        DialogType::Direct,
-        user,
-    );
+    let mut dialog = Dialog::new(Uuid::new_v4(), DialogType::Direct, user);
 
     // Switch to a topic
     let topic = Topic::new(
@@ -136,11 +118,7 @@ fn test_dialog_lifecycle() {
         metadata: HashMap::new(),
     };
 
-    let mut dialog = Dialog::new(
-        Uuid::new_v4(),
-        DialogType::Direct,
-        user,
-    );
+    let mut dialog = Dialog::new(Uuid::new_v4(), DialogType::Direct, user);
 
     // Pause the dialog
     let pause_events = dialog.pause().unwrap();
@@ -169,11 +147,7 @@ fn test_context_variables() {
         metadata: HashMap::new(),
     };
 
-    let mut dialog = Dialog::new(
-        Uuid::new_v4(),
-        DialogType::Direct,
-        user,
-    );
+    let mut dialog = Dialog::new(Uuid::new_v4(), DialogType::Direct, user);
 
     // Add a context variable
     let variable = ContextVariable {
@@ -189,4 +163,4 @@ fn test_context_variables() {
     assert_eq!(events.len(), 1);
     assert_eq!(dialog.context().variables.len(), 1);
     assert!(dialog.context().variables.contains_key("user_preference"));
-} 
+}

@@ -2,4 +2,4 @@
 
 pub struct DialogView;
 pub struct ConversationHistory;
-pub struct ActiveDialogs; 
+pub struct ActiveDialogs;

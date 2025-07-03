@@ -145,7 +145,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     };
 
     let history = query_handler.handle(history_query).await?;
-    println!("   Conversation has {} messages", history.messages.len());
+    println!("   Conversation has {history.messages.len(} messages"));
 
     for (idx, message) in history.messages.iter().enumerate() {
         println!(
@@ -191,13 +191,13 @@ impl MessageHelpers for cim_domain_dialog::value_objects::Message {
         match &self.content {
             MessageContent::Text { text } => {
                 if text.len() > 50 {
-                    format!("{}...", &text[..47])
+                    format!("{&text[..47]}...")
                 } else {
                     text.clone()
                 }
             }
             MessageContent::Structured { format, .. } => {
-                format!("[Structured: {}]", format)
+                format!("[Structured: {format}]")
             }
         }
     }
