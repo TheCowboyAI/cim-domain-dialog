@@ -13,15 +13,16 @@ use std::collections::HashMap;
 use uuid::Uuid;
 
 use crate::value_objects::{
-    ContextVariable, ConversationMetrics, Participant, Topic, TopicStatus, Turn,
+    ContextVariable, ContextScope, ConversationMetrics, Participant, Topic, TopicStatus, Turn,
 };
+use crate::events::{DialogMetadataSet, ContextUpdated, ParticipantRemoved, TopicCompleted};
 
 /// Marker type for Dialog entities
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct DialogMarker;
 
 /// Dialog aggregate root
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct Dialog {
     /// Entity base
     entity: Entity<DialogMarker>,
@@ -444,5 +445,181 @@ impl Default for ConversationContext {
             history: Vec::new(),
             max_history: 10,
         }
+    }
+}
+
+impl Clone for Dialog {
+    fn clone(&self) -> Self {
+        Self {
+            entity: self.entity.clone(),
+            dialog_type: self.dialog_type,
+            status: self.status,
+            participants: self.participants.clone(),
+            primary_participant: self.primary_participant,
+            context: self.context.clone(),
+            turns: self.turns.clone(),
+            topics: self.topics.clone(),
+            current_topic: self.current_topic,
+            metrics: self.metrics.clone(),
+            metadata: self.metadata.clone(),
+            version: self.version,
+        }
+    }
+}
+
+impl Dialog {
+    /// Check if the dialog has ended
+    pub fn is_ended(&self) -> bool {
+        matches!(self.status, DialogStatus::Ended | DialogStatus::Abandoned)
+    }
+
+    /// Get the number of turns in the dialog
+    pub fn turn_count(&self) -> usize {
+        self.turns.len()
+    }
+
+    /// Set metadata on the dialog
+    pub fn set_metadata(
+        &mut self,
+        key: String,
+        value: serde_json::Value,
+    ) -> DomainResult<Vec<Box<dyn DomainEvent>>> {
+        if self.status == DialogStatus::Ended || self.status == DialogStatus::Abandoned {
+            return Err(DomainError::InvalidStateTransition {
+                from: format!("{:?}", self.status),
+                to: "Active/Paused (required for setting metadata)".to_string(),
+            });
+        }
+
+        self.metadata.insert(key.clone(), value.clone());
+        self.entity.touch();
+        self.version += 1;
+
+        let event = DialogMetadataSet {
+            dialog_id: self.id(),
+            key,
+            value,
+            set_at: Utc::now(),
+        };
+
+        Ok(vec![Box::new(event)])
+    }
+
+    /// Update context variables in bulk
+    pub fn update_context(
+        &mut self,
+        variables: HashMap<String, serde_json::Value>,
+    ) -> DomainResult<Vec<Box<dyn DomainEvent>>> {
+        if self.status != DialogStatus::Active {
+            return Err(DomainError::InvalidStateTransition {
+                from: format!("{:?}", self.status),
+                to: "Active (required for updating context)".to_string(),
+            });
+        }
+
+        // Update context variables
+        for (key, value) in &variables {
+            let var = ContextVariable {
+                name: key.clone(),
+                value: value.clone(),
+                scope: ContextScope::Dialog,
+                set_at: Utc::now(),
+                expires_at: None,
+                source: self.id(), // Use dialog ID as source
+            };
+            self.context.variables.insert(key.clone(), var);
+        }
+
+        self.entity.touch();
+        self.version += 1;
+
+        let event = ContextUpdated {
+            dialog_id: self.id(),
+            updated_variables: variables,
+            updated_at: Utc::now(),
+        };
+
+        Ok(vec![Box::new(event)])
+    }
+
+    /// Remove a participant from the dialog
+    pub fn remove_participant(
+        &mut self,
+        participant_id: Uuid,
+        reason: Option<String>,
+    ) -> DomainResult<Vec<Box<dyn DomainEvent>>> {
+        if self.status != DialogStatus::Active {
+            return Err(DomainError::InvalidStateTransition {
+                from: format!("{:?}", self.status),
+                to: "Active (required for removing participants)".to_string(),
+            });
+        }
+
+        // Can't remove primary participant
+        if participant_id == self.primary_participant {
+            return Err(DomainError::ValidationError(
+                "Cannot remove primary participant".to_string(),
+            ));
+        }
+
+        // Check participant exists
+        if !self.participants.contains_key(&participant_id) {
+            return Err(DomainError::EntityNotFound {
+                entity_type: "Participant".to_string(),
+                id: participant_id.to_string(),
+            });
+        }
+
+        self.participants.remove(&participant_id);
+        self.entity.touch();
+        self.version += 1;
+
+        let event = ParticipantRemoved {
+            dialog_id: self.id(),
+            participant_id,
+            removed_at: Utc::now(),
+            reason,
+        };
+
+        Ok(vec![Box::new(event)])
+    }
+
+    /// Mark a topic as complete
+    pub fn mark_topic_complete(
+        &mut self,
+        topic_id: Uuid,
+        resolution: Option<String>,
+    ) -> DomainResult<Vec<Box<dyn DomainEvent>>> {
+        if self.status != DialogStatus::Active {
+            return Err(DomainError::InvalidStateTransition {
+                from: format!("{:?}", self.status),
+                to: "Active (required for completing topics)".to_string(),
+            });
+        }
+
+        // Check topic exists
+        if !self.topics.contains_key(&topic_id) {
+            return Err(DomainError::EntityNotFound {
+                entity_type: "Topic".to_string(),
+                id: topic_id.to_string(),
+            });
+        }
+
+        // Mark topic as complete by updating its status
+        if let Some(topic) = self.topics.get_mut(&topic_id) {
+            topic.status = TopicStatus::Completed;
+        }
+
+        self.entity.touch();
+        self.version += 1;
+
+        let event = TopicCompleted {
+            dialog_id: self.id(),
+            topic_id,
+            completed_at: Utc::now(),
+            resolution,
+        };
+
+        Ok(vec![Box::new(event)])
     }
 }

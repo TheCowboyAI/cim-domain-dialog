@@ -276,3 +276,73 @@ impl DomainEvent for ContextVariableAdded {
         "ContextVariableAdded"
     }
 }
+
+/// Dialog domain event enum
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum DialogDomainEvent {
+    DialogStarted(DialogStarted),
+    DialogEnded(DialogEnded),
+    DialogPaused(DialogPaused),
+    DialogResumed(DialogResumed),
+    TurnAdded(TurnAdded),
+    ParticipantAdded(ParticipantAdded),
+    ParticipantRemoved(ParticipantRemoved),
+    ContextSwitched(ContextSwitched),
+    ContextUpdated(ContextUpdated),
+    ContextVariableAdded(ContextVariableAdded),
+    DialogMetadataSet(DialogMetadataSet),
+    TopicCompleted(TopicCompleted),
+}
+
+impl DomainEvent for DialogDomainEvent {
+    fn subject(&self) -> String {
+        match self {
+            Self::DialogStarted(e) => e.subject(),
+            Self::DialogEnded(e) => e.subject(),
+            Self::DialogPaused(e) => e.subject(),
+            Self::DialogResumed(e) => e.subject(),
+            Self::TurnAdded(e) => e.subject(),
+            Self::ParticipantAdded(e) => e.subject(),
+            Self::ParticipantRemoved(e) => e.subject(),
+            Self::ContextSwitched(e) => e.subject(),
+            Self::ContextUpdated(e) => e.subject(),
+            Self::ContextVariableAdded(e) => e.subject(),
+            Self::DialogMetadataSet(e) => e.subject(),
+            Self::TopicCompleted(e) => e.subject(),
+        }
+    }
+
+    fn aggregate_id(&self) -> Uuid {
+        match self {
+            Self::DialogStarted(e) => e.aggregate_id(),
+            Self::DialogEnded(e) => e.aggregate_id(),
+            Self::DialogPaused(e) => e.aggregate_id(),
+            Self::DialogResumed(e) => e.aggregate_id(),
+            Self::TurnAdded(e) => e.aggregate_id(),
+            Self::ParticipantAdded(e) => e.aggregate_id(),
+            Self::ParticipantRemoved(e) => e.aggregate_id(),
+            Self::ContextSwitched(e) => e.aggregate_id(),
+            Self::ContextUpdated(e) => e.aggregate_id(),
+            Self::ContextVariableAdded(e) => e.aggregate_id(),
+            Self::DialogMetadataSet(e) => e.aggregate_id(),
+            Self::TopicCompleted(e) => e.aggregate_id(),
+        }
+    }
+
+    fn event_type(&self) -> &'static str {
+        match self {
+            Self::DialogStarted(e) => e.event_type(),
+            Self::DialogEnded(e) => e.event_type(),
+            Self::DialogPaused(e) => e.event_type(),
+            Self::DialogResumed(e) => e.event_type(),
+            Self::TurnAdded(e) => e.event_type(),
+            Self::ParticipantAdded(e) => e.event_type(),
+            Self::ParticipantRemoved(e) => e.event_type(),
+            Self::ContextSwitched(e) => e.event_type(),
+            Self::ContextUpdated(e) => e.event_type(),
+            Self::ContextVariableAdded(e) => e.event_type(),
+            Self::DialogMetadataSet(e) => e.event_type(),
+            Self::TopicCompleted(e) => e.event_type(),
+        }
+    }
+}

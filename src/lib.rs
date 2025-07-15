@@ -31,13 +31,13 @@ pub use commands::{
 };
 
 pub use events::{
-    ContextSwitched, ContextUpdated, ContextVariableAdded, DialogEnded, DialogMetadataSet,
-    DialogPaused, DialogResumed, DialogStarted, ParticipantAdded, ParticipantRemoved,
-    TopicCompleted, TurnAdded,
+    ContextSwitched, ContextUpdated, ContextVariableAdded, DialogDomainEvent, DialogEnded, 
+    DialogMetadataSet, DialogPaused, DialogResumed, DialogStarted, ParticipantAdded, 
+    ParticipantRemoved, TopicCompleted, TurnAdded,
 };
 
 pub use handlers::{DialogCommandHandler, DialogEventHandler};
-pub use projections::{ActiveDialogs, ConversationHistory, DialogView};
+pub use projections::{SimpleDialogView, SimpleProjectionUpdater};
 pub use queries::{DialogQuery, DialogQueryHandler};
 
 pub use value_objects::{
