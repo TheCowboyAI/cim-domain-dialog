@@ -18,6 +18,7 @@ pub mod events;
 pub mod handlers;
 pub mod projections;
 pub mod queries;
+pub mod routing;
 pub mod value_objects;
 
 // Re-export main types
